@@ -1,18 +1,17 @@
 package com.tencentyun;
 
+import org.json.JSONObject;
 // 使用旧版本 base64 编解码实现增强兼容性
 import sun.misc.BASE64Encoder;
 
-import java.io.UnsupportedEncodingException;
-import java.security.*;
-import java.nio.charset.Charset;
-
-import java.util.Arrays;
-import java.util.zip.Deflater;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import org.json.JSONObject;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.zip.Deflater;
 
 public class TLSSigAPIv2 {
     private long sdkappid;
@@ -47,9 +46,9 @@ public class TLSSigAPIv2 {
         }
     }
 
-    private String genSig(String identifier, long expire, byte[] userbuf) {
+    private String genSig(String identifier, long expire, long currTime, byte[] userbuf) {
 
-        long currTime = System.currentTimeMillis()/1000;
+//        long currTime = System.currentTimeMillis()/1000;
 
         JSONObject sigDoc = new JSONObject();
         sigDoc.put("TLS.ver", "2.0");
@@ -78,11 +77,11 @@ public class TLSSigAPIv2 {
                 0, compressedBytesLength)))).replaceAll("\\s*", "");
     }
 
-    public String genSig(String identifier, long expire) {
-        return genSig(identifier, expire, null);
+    public String genSig(String identifier, long expire, long time) {
+        return genSig(identifier, expire, time, null);
     }
 
-    public String genSigWithUserBuf(String identifier, long expire, byte[] userbuf) {
-        return genSig(identifier, expire, userbuf);
+    public String genSigWithUserBuf(String identifier, long expire, long time, byte[] userbuf) {
+        return genSig(identifier, expire, time, userbuf);
     }
 }
